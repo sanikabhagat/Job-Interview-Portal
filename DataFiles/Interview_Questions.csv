@@ -1,0 +1,21 @@
+﻿Interview Question ID,Job ID,Interview Question Description,Level of Difficulty,Technologies
+1,11070,What is conditional formatting in Tableau?,Easy,Tableau
+2,10241,What's the data structure in data warehouse?,Medium,ETL
+2,10241,What's the data structure in data warehouse?,Medium,Data Warehousing
+3,10680,What is logistic regression? What is Bayesian Heirarchical modeling? ,Easy,Machine Learning
+3,10680,What is logistic regression? What is Bayesian Heirarchical modeling? ,Easy,Regression
+3,10680,What is logistic regression? What is Bayesian Heirarchical modeling? ,Easy,Data Science Models
+4,10346,What is an abstract class and why would you use it?,Medium,Java
+4,10346,What is an abstract class and why would you use it?,Medium,OOP
+5,11468,"In jQuery, describe how the selector syntax works for the click function.",Medium,JQuery
+5,11468,"In jQuery, describe how the selector syntax works for the click function.",Medium,Web Development
+6,11741,1. talk about the flow of working with react 2. schema design 3. RESTful api 4. algo questions like the typical matching parenthesis problem,Medium,React
+7,11341,Difference between Swift and Objective C,Easy,Swift
+7,11341,Difference between Swift and Objective C,Easy,Swift
+8,11682,"MVC Architecture, Problems with MVC, MVVM architecture, UITableViews, UICollectionViews",Hard,MVC
+9,10557,"Given a binary tree with the usual left and right pointers on each node, and additionally a parent pointer, make an algorithm to discover the closest ancestor to 2 nodes on the tree.",Hard,Algorithms
+9,10557,"Given a binary tree with the usual left and right pointers on each node, and additionally a parent pointer, make an algorithm to discover the closest ancestor to 2 nodes on the tree.",Hard,Data Structures
+9,10557,"Given a binary tree with the usual left and right pointers on each node, and additionally a parent pointer, make an algorithm to discover the closest ancestor to 2 nodes on the tree.",Hard,Programming
+10,11712,Write a program to translate alphanumeric phone number to numbers only,Hard,Algorithms
+10,11712,Write a program to translate alphanumeric phone number to numbers only,Hard,Data Structures
+10,11712,Write a program to translate alphanumeric phone number to numbers only,Hard,Programming

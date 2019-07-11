@@ -1,0 +1,46 @@
+Function Scripts:
+------------------------------------------------------------------------------------------------------------------------
+
+1. Doubt Response Function:
+------------------------------------------------------------------------------------------------------------------------
+A: Creating a Function
+------------------------------------------------------------------------------------------------------------------------
+create or replace FUNCTION DOUBT_RESPONSE_FUNC(DOUBT_ID IN NUMBER, RESPONSE IN LONG)
+RETURN NUMBER
+AS
+ROWS_AFFECTED NUMBER;
+SQL_STMT VARCHAR2(500);
+sysdate_var date;
+BEGIN
+sysdate_var := SYSDATE;
+SQL_STMT := 'INSERT INTO DOUBT_RESPONSE(DOUBT_ID, RESPONSE_DESCRIPTION,RESPONSE_DATE) VALUES (:1,:2,:3)';
+EXECUTE IMMEDIATE SQL_STMT USING DOUBT_ID, RESPONSE, sysdate_var;
+ROWS_AFFECTED := SQL%ROWCOUNT;
+    if (ROWS_AFFECTED = 1) then
+
+        commit;
+
+    else 
+        rollback;
+    end if;
+RETURN ROWS_AFFECTED;
+
+END;
+
+
+B: Calling a Function
+------------------------------------------------------------------------------------------------------------------------
+set serveroutput on
+DECLARE
+	rows_affected NUMBER := 0;
+	i_response_description doubt_response.response_description%type;
+	i_doubt_id doubt_response.doubt_id%type;
+  
+BEGIN
+
+    rows_affected := DOUBT_RESPONSE_FUNC(&doubt_id, '&i_response_description');
+    dbms_output.put_line('Number of Rows Affected: ' || to_char(rows_affected));
+END;
+/
+
+

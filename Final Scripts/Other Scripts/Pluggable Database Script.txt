@@ -1,0 +1,128 @@
+Create PDB Scripts:
+---------------------------------------------------------------------------------------
+
+1. Enter SYS Credentials
+---------------------------------------------------------------------------------------
+Enter user-name: SYS@orcl12 as SYSDBA
+Enter password: (usual without @)
+
+Connected to:
+Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+
+2. Create a pluggable database named EXTERNAL_PDB
+---------------------------------------------------------------------------------------
+SQL> CREATE PLUGGABLE DATABASE EXTERNAL_PDB ADMIN USER EXTERNAL_ADMIN IDENTIFIED BY PASSWORDFILE_NAME_CONVERT=('C:\app\Oracle_User\oradata\orcl12\pdbseed','C:\app\Oracle_User\oradata\orcl12\pdbseed\EXTERNAL_PDB');
+
+
+3. Show PDBs
+---------------------------------------------------------------------------------------
+SQL> show pdbs
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+         2 PDB$SEED                       READ ONLY  NO
+         3 ORCLPDB                        MOUNTED
+         4 HR_PDB                         MOUNTED
+         5 INTERNAL_PDB                   MOUNTED
+         6 EXTERNAL_PDB                   MOUNTED
+		 
+		 
+4. Since the pluggable database is mounted, we need to change the mode. 
+---------------------------------------------------------------------------------------
+SQL> alter pluggable database EXTERNAL_PDB open read write;
+
+Warning: PDB altered with errors.
+
+SQL> show pdbs;
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+         2 PDB$SEED                       READ ONLY  NO
+         3 ORCLPDB                        MOUNTED
+         4 HR_PDB                         MOUNTED
+         5 INTERNAL_PDB                   MOUNTED
+         6 EXTERNAL_PDB                   READ WRITE YES
+		 
+		 
+5. Make changes to tnsnames.ora file. The file is located at path 'C:\app\Oracle_User\product\12.2.0\dbhome_1\network\admin'
+Add the below code to the file
+---------------------------------------------------------------------------------------
+Code:
+EXTERNAL_PDB =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1522))
+      (CONNECT_DATA =
+        (SERVER = DEDICATED)
+        (SERVICE_NAME = external_pdb)
+      )
+  )
+
+(In this case, EXTERNAL_PDB is mu pluggable database name and SERVICE_NAME has been set to external_pdb. Also the port is changed to 1522)
+
+
+6. Open sqlplus again and login using SYS
+---------------------------------------------------------------------------------------
+SQL> connect sys/AugustMIS2017@127.0.0.1:1522/orcl12 as sysdba
+Connected.
+
+Connected to:
+Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+
+7. Now we need to grant certain privileges (Restricted session) to the ADMIN USER of pluggable database (EXTERNAL ADMIN)
+---------------------------------------------------------------------------------------
+SQL> alter session set container = EXTERNAL_PDB;
+
+Session altered.
+
+SQL> grant restricted session to EXTERNAL_ADMIN;
+
+Grant succeeded.
+
+SQL> grant all privileges to EXTERNAL_ADMIN;
+
+Grant succeeded.
+
+
+SQL> commit;
+
+Commit complete.
+
+
+8. Now open another sqlplus session and login using the pluggable database ADMIN USER
+---------------------------------------------------------------------------------------
+Enter user-name: EXTERNAL_ADMIN@external_pdb
+Enter password: PASSWORD
+
+Connected to:
+Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+
+9. We have an ADMIN USER of our pluggable database (EXTERNAL_ADMIN). Now we need to create a local user of the pluggable database. 
+---------------------------------------------------------------------------------------
+SQL> connect EXTERNAL_ADMIN/PASSWORD@external_pdb
+Connected.
+SQL> CREATE USER E_USER IDENTIFIED BY PASSWORD;
+
+User created.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> grant all privileges to E_USER;
+
+Grant succeeded.
+
+
+10. Now we will login to the pluggable database using LOCAL USER (E_USER)
+---------------------------------------------------------------------------------------
+SQL> connect E_USER/PASSWORD@external_pdb
+Connected.
+
+
+11. Pluggable database created, ADMIN USER and LOCAL USER created granting them the required privileges.
+
+		 
+		 

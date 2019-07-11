@@ -1,0 +1,68 @@
+Trigger Scripts:
+
+
+---------------------------------------------------------------------------------------------------------------
+1. User Login Trigger
+---------------------------------------------------------------------------------------------------------------
+create or replace TRIGGER USER_LOGIN_TRIGGER
+    AFTER LOGON 
+    ON C##PROJECT_ADMIN.SCHEMA
+BEGIN 
+INSERT INTO USER_LOGIN_LOG (USERNAME, LOGIN_DATE) VALUES (USER, SYSDATE);
+COMMIT;
+END;
+
+---------------------------------------------------------------------------------------------------------------
+
+2. User Signup Trigger
+
+	create or replace TRIGGER USER_SIGNUP_TRIGGER
+	  AFTER INSERT ON USER_INFO
+	  FOR EACH ROW
+
+	BEGIN
+		if (instr(:new.EMAIL,'northeastern.edu')>0) then
+		INSERT INTO USER_SIGNUP_LOG values (:new.email, 'Faculty',SYSDATE);
+		else 
+		INSERT INTO USER_SIGNUP_LOG values (:new.email, 'Student',SYSDATE);
+		end if;
+	END USER_SIGNUP_TRIGGER;
+	/
+---------------------------------------------------------------------------------------------------------------
+
+3. Insert Interview Questions Trigger
+
+create or replace TRIGGER INT_QUES_POSTED_TRIGGER
+    AFTER INSERT 
+    OR DELETE 
+    ON INTERVIEW_QUESTIONS
+    FOR EACH ROW
+
+	BEGIN
+    CASE
+    WHEN INSERTING THEN
+		INSERT INTO INT_QUES_POSTED_LOG values (:new.QUESTION_ID, :new.NUID,:new.POSTED_DATE);
+	WHEN DELETING THEN
+        DELETE FROM INT_QUES_POSTED_LOG WHERE QUESTION_ID = :new.QUESTION_ID;
+    END CASE;
+	END INT_QUES_POSTED_TRIGGER;
+---------------------------------------------------------------------------------------------------------------
+
+
+4. Insert Interview Questions Trigger
+
+create or replace TRIGGER DOUBT_POSTED_TRIGGER
+    AFTER INSERT 
+    OR DELETE 
+    ON DOUBTS
+    FOR EACH ROW
+
+	BEGIN
+    CASE
+    WHEN INSERTING THEN
+		INSERT INTO DOUBT_POSTED_LOG values (:new.DOUBT_ID, :new.NUID,:new.POSTED_DATE);
+	WHEN DELETING THEN
+        DELETE FROM DOUBT_POSTED_LOG WHERE DOUBT_ID = :new.DOUBT_ID;
+    END CASE;
+	END DOUBT_POSTED_TRIGGER;
+

@@ -1,0 +1,45 @@
+External Table Scripts
+--------------------------------------------------------------------------------------------------------
+
+
+1. Login with the pluggable database local user created using the Pluggable database script.
+--------------------------------------------------------------------------------------------------------
+SQL> connect E_USER/PASSWORD@external_pdb
+Connected.
+
+ 
+2. Create a directory and provide the path where your external dat file is stored.
+--------------------------------------------------------------------------------------------------------
+SQL> CREATE OR REPLACE DIRECTORY job_desc_dir as 'C:\app\Oracle_User\product\12.2.0\dbhome_1\ExternalData\';
+
+Directory created.
+
+
+3. Now create an external table in the database which will reference to the external file data. The External Table is created for Job Description. The SQL Code is:
+--------------------------------------------------------------------------------------------------------
+create table EXT_TAB_JOB_DESC (
+JOB_ID NUMBER not null enable,
+JOB_TITLE VARCHAR2(100) not null enable,
+COMPANY_NAME VARCHAR2(100) not null enable,
+DOMAIN VARCHAR2(40) not null enable
+)
+organization external
+(
+type oracle_loader
+default directory job_desc_dir
+access parameters
+(
+records delimited by newline
+badfile 'ext_tab_job_desc.bad'
+logfile 'ext_tab_job_desc.log'
+fields terminated by ','
+missing field values are null
+)
+location ('Job_Description.csv')
+);
+
+
+
+4. Now that the external table is created, you can run the below query to see the data
+--------------------------------------------------------------------------------------------------------
+SQL> SELECT * FROM EXT_TAB_JOB_DESC;

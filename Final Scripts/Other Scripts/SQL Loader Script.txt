@@ -1,0 +1,83 @@
+SQL Loader Script:
+--------------------------------------------------------------------------------------------------------
+
+
+1. Create a table in your database in which you want to load data with SQL Loader. Make sure that the column names in the table are exaclty same as that in your external file. I created the table in the pluggable database (EXTERNAL_ADMIN)
+--------------------------------------------------------------------------------------------------------
+
+  CREATE TABLE "EXTERNAL_ADMIN"."INTERVIEW_TIPS_TRICKS" 
+   (	"ID" NUMBER NOT NULL ENABLE, 
+	"CATEGORY" VARCHAR2(20 BYTE) NOT NULL ENABLE, 
+	"DESCRIPTION" LONG NOT NULL ENABLE, 
+	 CONSTRAINT "TABLE1_PK" PRIMARY KEY ("ID")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+
+  CREATE OR REPLACE EDITIONABLE TRIGGER "EXTERNAL_ADMIN"."TABLE1_TRG" 
+BEFORE INSERT ON "INTERVIEW_TIPS_TRICKS" 
+FOR EACH ROW 
+BEGIN
+  <<COLUMN_SEQUENCES>>
+  BEGIN
+    IF INSERTING AND :NEW.ID IS NULL THEN
+      SELECT TABLE1_SEQ.NEXTVAL INTO :NEW.ID FROM SYS.DUAL;
+    END IF;
+  END COLUMN_SEQUENCES;
+END;
+/
+ALTER TRIGGER "EXTERNAL_ADMIN"."TABLE1_TRG" ENABLE;
+
+
+
+2. Now store your external file in the ora_home directory. The ora_home directory in my case is 'C:\app\Oracle_User\product\12.2.0\dbhome_1\ExternalData'. External Data isjust a folder I have created inside dbhome_1 (ora_home) to store my external files. The name of the file is 'Interview_Tips_Tricks.csv'
+
+
+3. Now create a new file in the same path 'C:\app\Oracle_User\product\12.2.0\dbhome_1\ExternalData' and save the below code in the file.
+--------------------------------------------------------------------------------------------------------
+load data
+truncate
+into table INTERVIEW_TIPS_TRICKS
+fields terminated by ',' optionally enclosed by "#"
+(CATEGORY,DESCRIPTION)
+
+Important : Save the file with the same name as the external file. Also save the file with .ctl extension. I have saved the file as 'Interview_Tips_Tricks.ctl'
+
+
+
+4. Go to cmd. And run the following commands.
+--------------------------------------------------------------------------------------------------------
+C:\Users\Sanika>cd
+C:\Users\Sanika
+
+C:\Users\Sanika>sqlldr EXTERNAL_ADMIN/PASSWORD@external_pdb data='C:\app\Oracle_User\product\12.2.0\dbhome_1\ExternalData\Interview_Tips_Tricks.csv' control='C:\app\Oracle_User\product\12.2.0\dbhome_1
+\ExternalData\Interview_Tips_Tricks.ctl' bad='C:\app\Oracle_User\product\12.2.0\dbhome_1\ExternalData\Interview_Tips_Tricks.bad'
+
+SQL*Loader: Release 12.2.0.1.0 - Production on Wed Apr 24 23:13:37 2019
+
+Copyright (c) 1982, 2017, Oracle and/or its affiliates.  All rights reserved.
+
+Path used:      Conventional
+Commit point reached - logical record count 21
+
+Table INTERVIEW_TIPS_TRICKS:
+  21 Rows successfully loaded.
+
+Check the log file:
+  Interview_Tips_Tricks.log
+for more information about the load.
+
+C:\Users\Sanika>discard='C:\app\Oracle_User\product\12.2.0\dbhome_1\ExternalData\Interview_Tips_Tricks.dsc'
+
+
+
+5. SQL Loader loaded the data from external file to table successfully.

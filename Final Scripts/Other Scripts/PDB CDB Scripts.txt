@@ -1,0 +1,50 @@
+Project Scripts:
+
+Username : sys@orcl12 as sysdba
+Password: (usual without @)
+
+Check for CDB:
+
+show con_name
+SELECT CON_ID, CDB, NAME, OPEN_MODE FROM V$DATABASE;
+
+Create two pluggable database inside this CDB:
+
+CREATE PLUGGABLE DATABASE INTERNAL_PDB ADMIN USER INTERNAL_ADMIN IDENTIFIED BY PASSWORD FILE_NAME_CONVERT=('C:\app\Oracle_User\oradata\orcl12\pdbseed','C:\app\Oracle_User\oradata\orcl12\pdbseed\INTERNAL_PDB');
+
+CREATE PLUGGABLE DATABASE EXTERNAL_PDB ADMIN USER EXTERNAL_ADMIN IDENTIFIED BY PASSWORD FILE_NAME_CONVERT=('C:\app\Oracle_User\oradata\orcl12\pdbseed','C:\app\Oracle_User\oradata\orcl12\pdbseed\EXTERNAL_PDB');
+
+Check the CDBs that have been created:
+
+SELECT CON_ID, NAME, OPEN_MODE FROM V$Pdbs;
+
+Creating Tablespaces for the PDBs:
+
+For creating tablespaces, you first need to login to the PDB using the admin user and password credentials.
+
+Enter user-name: INTERNAL_ADMIN AS SYSDBA
+Enter password: PASSWORD
+
+After logging in, just set the container to the current pdb
+
+SQL> ALTER SESSION SET CONTAINER = INTERNAL_PDB;
+
+Session altered.
+
+After altering the session, set the status to open
+
+SQL> ALTER PLUGGABLE DATABASE INTERNAL_PDB OPEN;
+
+Now create tablespace for the PDB:
+
+CREATE TABLESPACE INTERNAL_TABLESPACE
+DATAFILE 'C:\app\Oracle_User\oradata\orcl12\pdbseed\INTERNAL_PDB\INTERNAL_TABLESPACE.DAT'
+SIZE 2G
+REUSE;
+
+Tablespace created.
+
+
+
+
+

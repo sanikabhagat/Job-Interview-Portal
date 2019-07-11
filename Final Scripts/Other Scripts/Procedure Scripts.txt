@@ -1,0 +1,224 @@
+Procedure Script:
+------------------------------------------------------------------------------------------------------------------------
+
+1. View Interview Question based on Domain:
+------------------------------------------------------------------------------------------------------------------------
+A. Create a Procedure
+------------------------------------------------------------------------------------------------------------------------
+create or replace procedure view_interview_questions(i_domain in varchar2, int_ques_refcursor out sys_refcursor)
+
+is
+
+begin
+
+open int_ques_refcursor for select QUESTION_ID, JOB_ID, QUESTION_DESCRIPTION, DIFFICULTY_LEVEL, POSTED_DATE from INTERVIEW_QUESTIONS where DOMAIN = i_domain
+order by POSTED_DATE DESC;
+
+end;
+
+B. Executing the Procedure
+------------------------------------------------------------------------------------------------------------------------
+DECLARE
+	type iq_out_record is record(
+	i_question_id interview_questions.question_id%type,
+	i_job_id interview_questions.job_id%type,
+    i_question_description interview_questions.question_description%type,
+    i_difficulty_level interview_questions.difficulty_level%type,
+    i_posted_date interview_questions.posted_date%type
+	);
+
+	iq_out iq_out_record;
+	i_domain interview_questions.domain%type;
+	i_int_ques_refcursor SYS_REFCURSOR;
+
+
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('QUESTION ID     JOB_ID     QUESTION DESCRIPTION                               DIFFICULTY LEVEL     POSTED DATE');
+    DBMS_OUTPUT.PUT_LINE('-----------------------------------------------------------------------------------------------------------------');
+
+    view_interview_questions('&i_domain', i_int_ques_refcursor);
+
+    FETCH i_int_ques_refcursor INTO iq_out;
+
+    while i_int_ques_refcursor%FOUND
+    
+    loop 
+    	DBMS_OUTPUT.PUT_LINE(iq_out.i_question_id || '               ' || iq_out.i_job_id || '     ' || iq_out.i_question_description || '       '|| iq_out.i_difficulty_level || '              '||iq_out.i_posted_date);
+    	FETCH i_int_ques_refcursor INTO iq_out;
+    	
+
+    end loop;
+    if i_int_ques_refcursor%ROWCOUNT=0 THEN
+    dbms_output.put_line('Please enter a valid Domain Name');
+	CLOSE i_int_ques_refcursor;
+    end if;
+EXCEPTION 
+    WHEN NO_DATA_FOUND THEN
+    dbms_output.put_line('No records');
+END;
+/
+------------------------------------------------------------------------------------------------------------------------
+
+
+2. View Interview Questions Posted by User:
+------------------------------------------------------------------------------------------------------------------------
+A: Create a Procedure
+------------------------------------------------------------------------------------------------------------------------
+create or replace procedure int_ques_by_user(i_nuid in char, int_ques_user_refcursor out sys_refcursor)
+
+is
+
+begin
+
+open int_ques_user_refcursor for select  QUESTION_ID, JOB_ID, QUESTION_DESCRIPTION, DIFFICULTY_LEVEL, POSTED_DATE from INTERVIEW_QUESTIONS where NUID = i_nuid
+order by POSTED_DATE DESC;
+
+end;
+
+
+B: Executing the Procedure
+------------------------------------------------------------------------------------------------------------------------
+DECLARE
+	type iq_out_record is record(
+	i_question_id interview_questions.question_id%type,
+    i_job_id interview_questions.job_id%type,
+    i_question_description interview_questions.question_description%type,
+    i_difficulty_level interview_questions.difficulty_level%type,
+    i_posted_date interview_questions.posted_date%type
+	);
+
+	iq_out iq_out_record;
+	i_nuid interview_questions.nuid%type;
+	i_int_ques_user_refcursor SYS_REFCURSOR;
+
+
+BEGIN
+   DBMS_OUTPUT.PUT_LINE('QUESTION ID     JOB_ID     QUESTION DESCRIPTION                               DIFFICULTY LEVEL     POSTED DATE');
+DBMS_OUTPUT.PUT_LINE('-----------------------------------------------------------------------------------------------------------------');
+
+    int_ques_by_user('&i_nuid', i_int_ques_user_refcursor);
+
+    FETCH i_int_ques_user_refcursor INTO iq_out;
+
+    while i_int_ques_user_refcursor%FOUND
+    
+    loop 
+    	DBMS_OUTPUT.PUT_LINE(iq_out.i_question_id || '               ' || iq_out.i_job_id || '     ' || iq_out.i_question_description || '       '|| iq_out.i_difficulty_level || '              '||iq_out.i_posted_date);
+    	FETCH i_int_ques_user_refcursor INTO iq_out;
+    	
+
+    end loop;
+    if i_int_ques_user_refcursor%ROWCOUNT=0 THEN
+    dbms_output.put_line('Please enter valid NUID');
+	CLOSE i_int_ques_user_refcursor;
+    end if;
+    EXCEPTION 
+    WHEN NO_DATA_FOUND THEN
+    dbms_output.put_line('No records');
+END;
+/
+------------------------------------------------------------------------------------------------------------------------
+
+
+3. View Doubts Posted by User:
+------------------------------------------------------------------------------------------------------------------------
+A: Create a Procedure
+------------------------------------------------------------------------------------------------------------------------
+
+create or replace procedure doubts_by_user(i_nuid in char, doubts_user_refcursor out sys_refcursor)
+
+is
+
+begin
+
+open doubts_user_refcursor for select  DOUBT_ID, DOUBT_DESCRIPTION, DOMAIN, POSTED_DATE from DOUBTS where NUID = i_nuid
+order by POSTED_DATE DESC;
+
+end;
+
+
+B. Executing the PROCEDURE
+------------------------------------------------------------------------------------------------------------------------
+DECLARE
+	type d_out_record is record(
+	i_doubt_id doubts.doubt_id%type,
+    i_doubt_description doubts.doubt_description%type,
+    i_domain doubts.domain%type,
+    i_posted_date doubts.posted_date%type
+	);
+
+	d_out d_out_record;
+	i_nuid interview_questions.nuid%type;
+	i_doubts_user_refcursor SYS_REFCURSOR;
+
+
+BEGIN
+   DBMS_OUTPUT.PUT_LINE('DOUBT ID     DOUBT DESCRIPTION                               DOMAIN     POSTED DATE');
+DBMS_OUTPUT.PUT_LINE('-----------------------------------------------------------------------------------------------------------------');
+
+    doubts_by_user('&i_nuid', i_doubts_user_refcursor);
+
+    FETCH i_doubts_user_refcursor INTO d_out;
+
+    while i_doubts_user_refcursor%FOUND
+    
+    loop 
+    	DBMS_OUTPUT.PUT_LINE(d_out.i_doubt_id || '               ' || d_out.i_doubt_description || '     ' || d_out.i_domain || '       '||d_out.i_posted_date);
+    	FETCH i_doubts_user_refcursor INTO d_out;
+    	
+
+    end loop;
+    if i_doubts_user_refcursor%ROWCOUNT=0 THEN
+    dbms_output.put_line('Please enter valid NUID');
+	CLOSE i_doubts_user_refcursor;
+    end if;
+    EXCEPTION 
+    WHEN NO_DATA_FOUND THEN
+    dbms_output.put_line('No records');
+END;
+/
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+4. Response to Interview Question Posted:
+------------------------------------------------------------------------------------------------------------------------
+A: Create a Procedure
+------------------------------------------------------------------------------------------------------------------------
+create or replace PROCEDURE INT_QUES_RESPONSE_FUNC(INT_QUES IN NUMBER, RESPONSE IN LONG, ROWS_AFFECTED OUT NUMBER)
+AS
+SQL_STMT VARCHAR2(500);
+sysdate_var date;
+BEGIN
+sysdate_var := SYSDATE;
+SQL_STMT := 'INSERT INTO INT_QUES_RESPONSE(INT_QUES_ID, RESPONSE_DESCRIPTION,RESPONSE_DATE) VALUES (:1,:2,:3)';
+EXECUTE IMMEDIATE SQL_STMT USING INT_QUES, RESPONSE, sysdate_var;
+ROWS_AFFECTED := SQL%ROWCOUNT;
+    if (ROWS_AFFECTED = 1) then
+
+        commit;
+
+    else 
+        rollback;
+    end if;
+
+
+END;
+
+
+B. Executing the PROCEDURE
+------------------------------------------------------------------------------------------------------------------------
+set serveroutput on
+DECLARE
+	i_response_description int_ques_response.response_description%type;
+	i_question_id interview_questions.question_id%type;
+    rows_affected number;
+BEGIN
+
+    INT_QUES_RESPONSE_FUNC(&i_question_id, '&i_response_description',rows_affected);
+    dbms_output.put_line('Number of Rows Affected: ' || to_char(rows_affected));
+END;
+/
+------------------------------------------------------------------------------------------------------------------------
+
+
